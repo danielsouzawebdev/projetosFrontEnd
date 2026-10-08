@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Projeto 2: Lista de Tarefas — Projetos na Prática</title>
+<meta name="description" content="Passo a passo: construa uma lista de tarefas com filtros e localStorage, usando HTML, CSS, JavaScript e Bootstrap.">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="proj-2">
+
+<header class="site-header">
+  <div class="bar">
+    <a class="brand" href="index.html">
+      <span class="layers-mark"><span></span><span></span><span></span><span></span></span>
+      Projetos na Prática
+    </a>
+    <nav class="site-nav">
+      <a href="index.html">Início</a>
+      <a href="projeto1.html">Projeto 1</a>
+      <a href="projeto2.html" aria-current="page">Projeto 2</a>
+      <a href="projeto3.html">Projeto 3</a>
+    </nav>
+  </div>
+</header>
+<div class="level-nav">
+  <div class="bar">
+    <a class="level-pill" href="projeto1.html">1 · Pet Shop</a>
+    <a class="level-pill" aria-current="page" href="projeto2.html">2 · Lista de Tarefas</a>
+    <a class="level-pill" href="projeto3.html">3 · Painel do Tempo</a>
+  </div>
+</div>
+
+<div class="docs">
+  <aside class="docs-side">
+    <p class="side-title">Passos</p>
+    <ul>
+      <li><a href="#passo1">1. Estrutura de pastas</a></li>
+      <li><a href="#passo2">2. HTML base</a></li>
+      <li><a href="#passo3">3. CSS de apoio</a></li>
+      <li><a href="#passo4">4. Estado e renderização</a></li>
+      <li><a href="#passo5">5. Adicionar tarefa</a></li>
+      <li><a href="#passo6">6. Concluir e remover</a></li>
+      <li><a href="#passo7">7. Filtros</a></li>
+      <li><a href="#passo8">8. Contador de pendentes</a></li>
+      <li><a href="#passo9">9. Persistência com localStorage</a></li>
+      <li><a href="#checklist">Checklist final</a></li>
+      <li><a href="#desafio">Desafio extra</a></li>
+    </ul>
+  </aside>
+
+  <main class="docs-main">
+    <p class="page-kicker">projeto 2 de 3 · nível intermediário</p>
+    <h1>Lista de Tarefas com Filtros</h1>
+    <div class="tech-tags">
+      <span class="tech-tag tech-tag--html">HTML</span>
+      <span class="tech-tag tech-tag--css">CSS</span>
+      <span class="tech-tag tech-tag--js">JavaScript</span>
+      <span class="tech-tag tech-tag--bs">Bootstrap</span>
+    </div>
+    <p class="lede">Um gerenciador de tarefas de verdade: adicionar, concluir, remover, filtrar por status — tudo guardado no navegador, sobrevivendo a um recarregamento de página.</p>
+
+    <div class="callout">
+      <span class="label">Pré-requisitos</span>
+      <p>Além do <a href="projeto1.html">Projeto 1</a>, os módulos de <a href="../js-site/intermediario.html">JavaScript Intermediário</a> (DOM, eventos, JSON e localStorage) — este projeto é essencialmente a prática guiada daquele material inteiro.</p>
+    </div>
+
+    <section id="passo1">
+      <h2>Passo 1 — Estrutura de pastas</h2>
+      <pre><code>lista-tarefas/
+├── index.html
+├── style.css
+└── script.js</code></pre>
+    </section>
+
+    <section id="passo2">
+      <h2>Passo 2 — HTML base</h2>
+      <div class="filebar">index.html</div>
+      <pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="pt-BR"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+  &lt;title&gt;Minhas Tarefas&lt;/title&gt;
+  &lt;link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"&gt;
+  &lt;link href="style.css" rel="stylesheet"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;div class="container py-5" style="max-width: 600px;"&gt;
+  &lt;h1 class="mb-4"&gt;Minhas Tarefas &lt;span id="contadorPendentes" class="badge bg-primary"&gt;0&lt;/span&gt;&lt;/h1&gt;
+
+  &lt;form id="formNovaTarefa" class="input-group mb-3"&gt;
+    &lt;input type="text" id="inputTarefa" class="form-control" placeholder="O que você precisa fazer?" required&gt;
+    &lt;button class="btn btn-primary" type="submit"&gt;Adicionar&lt;/button&gt;
+  &lt;/form&gt;
+
+  &lt;div class="btn-group mb-3" role="group"&gt;
+    &lt;button class="btn btn-outline-secondary filtro ativo" data-filtro="todas"&gt;Todas&lt;/button&gt;
+    &lt;button class="btn btn-outline-secondary filtro" data-filtro="pendentes"&gt;Pendentes&lt;/button&gt;
+    &lt;button class="btn btn-outline-secondary filtro" data-filtro="concluidas"&gt;Concluídas&lt;/button&gt;
+  &lt;/div&gt;
+
+  &lt;ul id="listaTarefas" class="list-group"&gt;&lt;/ul&gt;
+
+  &lt;p id="mensagemVazia" class="text-muted text-center mt-4 d-none"&gt;Nenhuma tarefa por aqui.&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"&gt;&lt;/script&gt;
+&lt;script src="script.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+      <p class="note">O <code>&lt;ul id="listaTarefas"&gt;</code> começa vazio de propósito — o JavaScript é quem vai preencher o conteúdo dinamicamente, a partir do Passo 4.</p>
+    </section>
+
+    <section id="passo3">
+      <h2>Passo 3 — CSS de apoio</h2>
+      <div class="filebar">style.css</div>
+      <pre><code>.tarefa-concluida {
+  text-decoration: line-through;
+  color: #888;
+}
+
+.filtro.ativo {
+  background-color: #0d6efd;
+  color: white;
+}</code></pre>
+      <p class="note">Essas duas classes não existem no Bootstrap — são exatamente o tipo de ajuste pequeno e específico que fica no seu próprio CSS, por cima do framework.</p>
+    </section>
+
+    <section id="passo4">
+      <h2>Passo 4 — Estado e renderização</h2>
+      <p>Toda lista de tarefas precisa de um lugar para guardar os dados <strong>antes</strong> de desenhar qualquer coisa na tela. Comece <code>script.js</code> assim:</p>
+      <div class="filebar">script.js</div>
+      <pre><code>let tarefas = [];
+let filtroAtual = "todas";
+
+function renderizar() {
+  const lista = document.querySelector("#listaTarefas");
+  const mensagemVazia = document.querySelector("#mensagemVazia");
+
+  const tarefasFiltradas = tarefas.filter((tarefa) => {
+    if (filtroAtual === "pendentes") return !tarefa.concluida;
+    if (filtroAtual === "concluidas") return tarefa.concluida;
+    return true; // "todas"
+  });
+
+  lista.innerHTML = "";
+
+  tarefasFiltradas.forEach((tarefa) => {
+    const item = document.createElement("li");
+    item.className = "list-group-item d-flex justify-content-between align-items-center";
+    item.innerHTML = `
+      &lt;span class="${tarefa.concluida ? "tarefa-concluida" : ""}"&gt;${tarefa.texto}&lt;/span&gt;
+      &lt;span&gt;
+        &lt;button class="btn btn-sm btn-outline-success btn-concluir" data-id="${tarefa.id}"&gt;✓&lt;/button&gt;
+        &lt;button class="btn btn-sm btn-outline-danger btn-remover" data-id="${tarefa.id}"&gt;✕&lt;/button&gt;
+      &lt;/span&gt;
+    `;
+    lista.appendChild(item);
+  });
+
+  mensagemVazia.classList.toggle("d-none", tarefasFiltradas.length > 0);
+}
+
+renderizar();</code></pre>
+      <p>Cada tarefa vai ser um objeto <code>{ id, texto, concluida }</code>. A função <code>renderizar()</code> apaga a lista inteira (<code>lista.innerHTML = ""</code>) e a reconstrói do zero a cada chamada — mais simples de raciocinar do que tentar atualizar só o item que mudou, e rápido o suficiente para uma lista de tarefas pessoal.</p>
+    </section>
+
+    <section id="passo5">
+      <h2>Passo 5 — Adicionar tarefa</h2>
+      <div class="filebar">script.js</div>
+      <pre><code>const formNovaTarefa = document.querySelector("#formNovaTarefa");
+const inputTarefa = document.querySelector("#inputTarefa");
+
+formNovaTarefa.addEventListener("submit", (evento) => {
+  evento.preventDefault();
+
+  const texto = inputTarefa.value.trim();
+  if (texto === "") return;
+
+  tarefas.push({
+    id: Date.now(),      // forma simples de gerar um id único
+    texto: texto,
+    concluida: false
+  });
+
+  inputTarefa.value = "";
+  renderizar();
+});</code></pre>
+      <p class="note"><code>Date.now()</code> retorna o número de milissegundos desde 1970 — como duas tarefas quase nunca são criadas no mesmo milissegundo exato, funciona bem como id único para um projeto deste tamanho.</p>
+      <p>Salve e teste: digite algo no campo, clique em "Adicionar" (ou aperte Enter) — a tarefa deve aparecer na lista.</p>
+    </section>
+
+    <section id="passo6">
+      <h2>Passo 6 — Concluir e remover</h2>
+      <p>Os botões ✓ e ✕ são recriados toda vez que <code>renderizar()</code> roda — por isso não dá para ligar um <code>addEventListener</code> direto neles uma única vez. A solução é <strong>delegação de eventos</strong>: escutar o clique no <code>&lt;ul&gt;</code> (que sempre existe) e descobrir, a partir dali, em qual botão o clique realmente aconteceu.</p>
+      <div class="filebar">script.js</div>
+      <pre><code>const listaTarefas = document.querySelector("#listaTarefas");
+
+listaTarefas.addEventListener("click", (evento) => {
+  const botaoConcluir = evento.target.closest(".btn-concluir");
+  const botaoRemover = evento.target.closest(".btn-remover");
+
+  if (botaoConcluir) {
+    const id = Number(botaoConcluir.dataset.id);
+    const tarefa = tarefas.find((t) => t.id === id);
+    tarefa.concluida = !tarefa.concluida;
+    renderizar();
+  }
+
+  if (botaoRemover) {
+    const id = Number(botaoRemover.dataset.id);
+    tarefas = tarefas.filter((t) => t.id !== id);
+    renderizar();
+  }
+});</code></pre>
+      <p class="note"><code>evento.target.closest(".btn-concluir")</code> funciona mesmo se o clique acontecer no ícone dentro do botão, não só no botão em si — <code>closest</code> sobe pela árvore do DOM até achar o elemento mais próximo que casa com o seletor.</p>
+    </section>
+
+    <section id="passo7">
+      <h2>Passo 7 — Filtros</h2>
+      <div class="filebar">script.js</div>
+      <pre><code>const botoesFiltro = document.querySelectorAll(".filtro");
+
+botoesFiltro.forEach((botao) => {
+  botao.addEventListener("click", () => {
+    filtroAtual = botao.dataset.filtro;
+
+    botoesFiltro.forEach((b) => b.classList.remove("ativo"));
+    botao.classList.add("ativo");
+
+    renderizar();
+  });
+});</code></pre>
+      <p>Repare que <code>renderizar()</code> já sabia filtrar (Passo 4) — este passo só adiciona a interface para <em>escolher</em> o filtro, mudando a variável <code>filtroAtual</code> e chamando a mesma função de novo.</p>
+    </section>
+
+    <section id="passo8">
+      <h2>Passo 8 — Contador de pendentes</h2>
+      <p>Dentro de <code>renderizar()</code>, logo antes do fechamento da função, adicione:</p>
+      <div class="filebar">script.js</div>
+      <pre><code>function renderizar() {
+  // ... todo o código que já existe ...
+
+  const pendentes = tarefas.filter((t) => !t.concluida).length;
+  document.querySelector("#contadorPendentes").textContent = pendentes;
+}</code></pre>
+      <p class="note">Esse contador conta sempre sobre <code>tarefas</code> (a lista completa), não sobre <code>tarefasFiltradas</code> — ele deve mostrar quantas estão pendentes no total, independente do filtro selecionado na tela.</p>
+    </section>
+
+    <section id="passo9">
+      <h2>Passo 9 — Persistência com localStorage</h2>
+      <p>Sem isso, tudo some ao recarregar a página. Duas peças: salvar sempre que algo mudar, e carregar ao abrir.</p>
+      <div class="filebar">script.js</div>
+      <pre><code>function salvar() {
+  localStorage.setItem("tarefas", JSON.stringify(tarefas));
+}
+
+function carregar() {
+  const salvas = localStorage.getItem("tarefas");
+  tarefas = salvas ? JSON.parse(salvas) : [];
+}</code></pre>
+      <p>Agora chame <code>salvar()</code> em todo lugar que modifica o array — depois do <code>push</code> (adicionar), depois do toggle de <code>concluida</code>, e depois do <code>filter</code> (remover). A forma mais simples é chamar dentro da própria <code>renderizar()</code>, já que ela roda depois de toda mudança:</p>
+      <pre><code>function renderizar() {
+  salvar();   // primeira linha da função
+
+  // ... resto do código que já existe ...
+}</code></pre>
+      <p>E troque a linha final do arquivo (que hoje é só <code>renderizar();</code>) por:</p>
+      <pre><code>carregar();
+renderizar();</code></pre>
+      <div class="callout good">
+        <span class="label">Teste isto</span>
+        <p>Adicione algumas tarefas, conclua uma, e recarregue a página (<code>F5</code>). Tudo deve continuar exatamente como estava.</p>
+      </div>
+    </section>
+
+    <section id="checklist">
+      <h2>Checklist final</h2>
+      <ul class="checklist">
+        <li>Adicionar uma tarefa pelo campo de texto funciona, e o campo limpa sozinho depois</li>
+        <li>Clicar em ✓ risca o texto da tarefa; clicar de novo desfaz</li>
+        <li>Clicar em ✕ remove a tarefa da lista imediatamente</li>
+        <li>Os três botões de filtro mostram só as tarefas certas, e o botão ativo fica destacado</li>
+        <li>O número ao lado de "Minhas Tarefas" mostra a contagem de pendentes, sempre atualizada</li>
+        <li>Recarregar a página (<code>F5</code>) não apaga as tarefas</li>
+      </ul>
+    </section>
+
+    <section id="desafio">
+      <h2>Desafio extra</h2>
+      <ol>
+        <li>Adicione um botão "Limpar concluídas" que remove de uma vez todas as tarefas marcadas como concluídas.</li>
+        <li>Permita editar o texto de uma tarefa existente com duplo clique nela (dica: troque o <code>&lt;span&gt;</code> por um <code>&lt;input&gt;</code> temporário).</li>
+        <li>Adicione um campo de prioridade (Baixa/Média/Alta) na criação da tarefa, mostrando um <code>badge</code> colorido correspondente ao lado do texto.</li>
+      </ol>
+    </section>
+
+    <div class="pagefoot">
+      <a href="projeto1.html">← Pet Shop</a>
+      <a href="projeto3.html">Próximo: Painel do Tempo →</a>
+    </div>
+  </main>
+</div>
+
+<footer class="site-footer">
+  Projetos na Prática — material de estudo publicado com GitHub Pages.
+</footer>
+
+</body>
+</html>
